@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
-namespace AuthService.Models
+namespace restaurantUtility.Models
 {
     [Table("cart")]
     [Index(nameof(ProductId), Name = "product_id")]

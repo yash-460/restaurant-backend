@@ -1,5 +1,4 @@
-﻿using AuthService.Data;
-using AuthService.Models;
+﻿using restaurantUtility.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AuthService.Models;
 
 namespace AuthService.Controllers
 {
@@ -29,7 +29,6 @@ namespace AuthService.Controllers
         /// <returns>JWT token for the requested user with roles</returns>
         [AllowAnonymous]
         [HttpPost]
-        [Route("authenticate")]
         public async Task<IActionResult> AuthenticateAsync(UserDTO user)
         {
 
@@ -54,7 +53,7 @@ namespace AuthService.Controllers
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return Ok(tokenHandler.WriteToken(token));
+            return Ok(new { token = tokenHandler.WriteToken(token) });
         }
 
     }

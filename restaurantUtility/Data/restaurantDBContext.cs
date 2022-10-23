@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using AuthService.Models;
+using restaurantUtility.Models;
 
 #nullable disable
 
-namespace AuthService.Data
+namespace restaurantUtility.Data
 {
     public partial class restaurantDBContext : DbContext
     {
@@ -142,7 +142,7 @@ namespace AuthService.Data
 
                 entity.Property(e => e.PhoneNumber).HasDefaultValueSql("'NULL'");
 
-                entity.Property(e => e.ShopId).HasDefaultValueSql("'NULL'");
+                entity.Property(e => e.StoreId).HasDefaultValueSql("'NULL'");
             });
 
             modelBuilder.Entity<UserRole>(entity =>

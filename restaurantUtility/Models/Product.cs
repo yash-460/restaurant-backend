@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
-namespace AuthService.Models
+namespace restaurantUtility.Models
 {
     [Table("product")]
     [Index(nameof(StoreId), Name = "product_store_constraint")]
@@ -32,14 +32,13 @@ namespace AuthService.Models
         [Column("description")]
         [StringLength(100)]
         public string Description { get; set; }
-        [Column("price", TypeName = "decimal(6,2)")]
-        public decimal Price { get; set; }
         [Required]
-        [Column("img_loc")]
-        [StringLength(200)]
-        public string ImgLoc { get; set; }
+        [Column("price", TypeName = "decimal(6,2)")]
+        public decimal? Price { get; set; }
+        [Column("img_loc", TypeName = "blob")]
+        public byte[] ImgLoc { get; set; }
         [Column("rating", TypeName = "double(1,0)")]
-        public double Rating { get; set; }
+        public double? Rating { get; set; }
         [Column("active")]
         public bool Active { get; set; }
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
-namespace AuthService.Models
+namespace restaurantUtility.Models
 {
     [Table("roles")]
     public partial class Role

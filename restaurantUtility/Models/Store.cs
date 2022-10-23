@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
-namespace AuthService.Models
+namespace restaurantUtility.Models
 {
     [Table("store")]
     public partial class Store
@@ -42,13 +42,12 @@ namespace AuthService.Models
         public string Province { get; set; }
         [Required]
         [Column("zip")]
-        [StringLength(6)]
+        [StringLength(7)]
         public string Zip { get; set; }
         [Column("rating", TypeName = "int(1)")]
         public int? Rating { get; set; }
-        [Column("img_loc")]
-        [StringLength(200)]
-        public string ImgLoc { get; set; }
+        [Column("img_loc", TypeName = "blob")]
+        public byte[] ImgLoc { get; set; }
 
         [InverseProperty(nameof(Order.Store))]
         public virtual ICollection<Order> Orders { get; set; }

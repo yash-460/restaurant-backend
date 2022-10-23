@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
-namespace AuthService.Models
+namespace restaurantUtility.Models
 {
     [Table("user")]
     public partial class User
@@ -29,17 +29,18 @@ namespace AuthService.Models
         public string Password { get; set; }
         [Column("first_name")]
         [StringLength(40)]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
         [Column("last_name")]
         [StringLength(40)]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
         [Column("email")]
         [StringLength(254)]
-        public string Email { get; set; }
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
+        public string? Email { get; set; }
         [Column("phone_number", TypeName = "int(10)")]
         public int? PhoneNumber { get; set; }
-        [Column("shop_id", TypeName = "int(4)")]
-        public int? ShopId { get; set; }
+        [Column("store_id", TypeName = "int(4)")]
+        public int? StoreId { get; set; }
 
         [InverseProperty(nameof(Cart.UserNameNavigation))]
         public virtual ICollection<Cart> Carts { get; set; }

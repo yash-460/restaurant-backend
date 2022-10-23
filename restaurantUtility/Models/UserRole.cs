@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
-namespace AuthService.Models
+namespace restaurantUtility.Models
 {
     [Table("user_role")]
     [Index(nameof(Role), Name = "role")]
@@ -27,5 +27,6 @@ namespace AuthService.Models
         [ForeignKey(nameof(UserName))]
         [InverseProperty(nameof(User.UserRoles))]
         public virtual User UserNameNavigation { get; set; }
+
     }
 }

@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "AuthService\AuthService.csproj", "{0161CD45-A911-49D2-9117-CA7B582D2094}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthService", "AuthService\AuthService.csproj", "{0161CD45-A911-49D2-9117-CA7B582D2094}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "restaurantUtility", "restaurantUtility\restaurantUtility.csproj", "{167D64CC-AB42-44B0-9E85-9869D7B0BB61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "restaurantUtility", "restaurantUtility\restaurantUtility.csproj", "{167D64CC-AB42-44B0-9E85-9869D7B0BB61}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserManagement", "UserManagement\UserManagement.csproj", "{DD06F233-58E0-4946-8964-1A8168BE7455}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoreManagementService", "StoreManagementService\StoreManagementService.csproj", "{1BAC9E93-786C-4252-9DC2-33391D5A541B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{167D64CC-AB42-44B0-9E85-9869D7B0BB61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{167D64CC-AB42-44B0-9E85-9869D7B0BB61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{167D64CC-AB42-44B0-9E85-9869D7B0BB61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD06F233-58E0-4946-8964-1A8168BE7455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD06F233-58E0-4946-8964-1A8168BE7455}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD06F233-58E0-4946-8964-1A8168BE7455}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD06F233-58E0-4946-8964-1A8168BE7455}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BAC9E93-786C-4252-9DC2-33391D5A541B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BAC9E93-786C-4252-9DC2-33391D5A541B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BAC9E93-786C-4252-9DC2-33391D5A541B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BAC9E93-786C-4252-9DC2-33391D5A541B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

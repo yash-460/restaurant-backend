@@ -1,10 +1,10 @@
-using restaurantUtility.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using restaurantUtility.Data;
 using System.Text;
 
-namespace AuthService
+namespace UserManagement
 {
     public class Program
     {
@@ -13,14 +13,6 @@ namespace AuthService
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy(name: "cors",
-                                  policy =>
-                                  {
-                                      policy.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
-                                  });
-            });
             builder.Services.AddDbContext<restaurantDBContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("restaurantDB")));
             builder.Services.AddAuthentication(options =>
             {
@@ -45,11 +37,8 @@ namespace AuthService
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
-            // Configure the HTTP request pipeline.
 
-            app.UseAuthentication();
-            app.UseAuthorization();
-            
+            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -57,7 +46,9 @@ namespace AuthService
             }
 
             app.UseHttpsRedirection();
-            app.UseCors("cors");
+            app.UseAuthentication();
+            app.UseAuthorization();
+
 
             app.MapControllers();
 
