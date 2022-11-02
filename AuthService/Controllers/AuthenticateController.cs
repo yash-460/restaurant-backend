@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using AuthService.Models;
+using StoreManagementService.Models;
 
 namespace AuthService.Controllers
 {
@@ -43,6 +44,8 @@ namespace AuthService.Controllers
             foreach (var role in result)
             {
                 claimIdentity.AddClaim(new Claim(ClaimTypes.Role, role.Role));
+                if (role.Role.Equals(Constants.STORE_OWNER_ROLE))
+                    claimIdentity.AddClaim(new Claim("Store",registerdUser.StoreId.ToString()));
             }
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.UTF8.GetBytes(_jwtSecret);

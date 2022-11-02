@@ -81,7 +81,7 @@ namespace StoreManagementService.Controllers
         {
             User user = await _context.Users.FindAsync(User.Identity.Name);
             if(user == null)
-                BadRequest("User not found");
+               return BadRequest("User not found");
 
             Store store = new Store();
             DTOToStore(storeDTO, ref store);
