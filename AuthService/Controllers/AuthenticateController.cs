@@ -8,11 +8,13 @@ using System.Security.Claims;
 using System.Text;
 using AuthService.Models;
 using StoreManagementService.Models;
+using restaurantUtility.Models;
 
 namespace AuthService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AuthenticateController : ControllerBase
     {
         private readonly restaurantDBContext _dbContext;
@@ -37,7 +39,21 @@ namespace AuthService.Controllers
             if (registerdUser == null || !registerdUser.Password.Equals(user.Password))
                 return Unauthorized();
 
-            var result = await  _dbContext.UserRoles.Where(r => r.UserName == user.UserName).ToListAsync();
+            var token = await CreateToken(registerdUser);          
+            return Ok(new { token = token });
+        }
+
+        [HttpPost]
+        [Route("RefreshToken")]
+        public async Task<IActionResult> RefreshTokenAsync() {
+            var registerdUser = _dbContext.Users.Find(User.Identity.Name);
+            var token = await CreateToken(registerdUser);
+            return Ok(new { token = token });
+        }
+
+        private async Task<String> CreateToken(User user)
+        {
+            var result = await _dbContext.UserRoles.Where(r => r.UserName == user.UserName).ToListAsync();
 
             var claimIdentity = new ClaimsIdentity();
             claimIdentity.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
@@ -45,7 +61,7 @@ namespace AuthService.Controllers
             {
                 claimIdentity.AddClaim(new Claim(ClaimTypes.Role, role.Role));
                 if (role.Role.Equals(Constants.STORE_OWNER_ROLE))
-                    claimIdentity.AddClaim(new Claim("Store",registerdUser.StoreId.ToString()));
+                    claimIdentity.AddClaim(new Claim("Store", user.StoreId.ToString()));
             }
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.UTF8.GetBytes(_jwtSecret);
@@ -56,8 +72,7 @@ namespace AuthService.Controllers
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return Ok(new { token = tokenHandler.WriteToken(token) });
+            return tokenHandler.WriteToken(token);
         }
-
     }
 }
