@@ -17,7 +17,7 @@ namespace StoreManagementService.Models
         public string Description { get; set; }
         [Required]
         public decimal? Price { get; set; }
-        public byte[] ImgLoc { get; set; }
+        public byte[]? ImgLoc { get; set; }
         public bool Active { get; set; }
 
     }

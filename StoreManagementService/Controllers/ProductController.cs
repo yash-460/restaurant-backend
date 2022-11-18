@@ -43,6 +43,41 @@ namespace StoreManagementService.Controllers
             return  product;
         }
 
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> PutProduct(int id, ProductDTO productDTO)
+        {
+            if (id != productDTO.ProductId)
+            {
+                return BadRequest();
+            }
+
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+                return BadRequest();
+
+            DTOToProduct(productDTO,product);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+
+            return NoContent();
+        }
+
+        private void DTOToProduct(ProductDTO productDTO, Product product)
+        {
+            product.ProductName = productDTO.ProductName;
+            product.Description = productDTO.Description;
+            product.Price = productDTO.Price;
+            product.ImgLoc = productDTO.ImgLoc;
+            product.Active = productDTO.Active;
+        }
 
     }
 }

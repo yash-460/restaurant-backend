@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
 using restaurantUtility.Data;
 using restaurantUtility.Models;
@@ -26,7 +27,7 @@ namespace UserManagement.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
         {
-            return await _context.Users.Select(x => new UserDTO(x)).ToListAsync();
+            return await _context.Users.Select(x => CreateDTO(x)).ToListAsync();
         }
 
         // GET: api/User/5
@@ -40,7 +41,7 @@ namespace UserManagement.Controllers
                 return NotFound();
             }
 
-            return new UserDTO(user);
+            return CreateDTO(user);
         }
 
         // PUT: api/User/5
@@ -108,27 +109,34 @@ namespace UserManagement.Controllers
             return NoContent();
         }
 
-        [HttpPost("password")]
-        public async Task<ActionResult<User>> ChangeUserPassword(User user)
+        public class Password
         {
-            _context.Users.Add(user);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (UserExists(user.UserName))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            [Required]
+            public string? password { get; set; }
+        }
+
+        [HttpPost("password")]
+        public async Task<ActionResult<User>> ChangeUserPassword(Password password)
+        {
+            User user = await _context.Users.FindAsync(User.Identity.Name);
+            user.Password = password.password;
+
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetUser", new { id = user.UserName }, user);
+        }
+
+        private UserDTO CreateDTO(User user)
+        {
+            UserDTO dto = new UserDTO();
+            dto.UserName = user.UserName;
+            dto.FirstName = user.FirstName;
+            dto.LastName = user.LastName;
+            dto.Email = user.Email;
+            dto.PhoneNumber = user.PhoneNumber;
+            dto.StoreId = user.StoreId;
+
+            return dto;
         }
 
         private bool UserExists(string id)

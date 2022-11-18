@@ -18,14 +18,5 @@ namespace UserManagement.Models
         public int? PhoneNumber { get; set; }
         public int? StoreId { get; set; }
 
-        public UserDTO(User user)
-        {
-            UserName = user.UserName;
-            FirstName = user.FirstName;
-            LastName = user.LastName;
-            Email = user.Email;
-            PhoneNumber = user.PhoneNumber;
-            StoreId = user.StoreId;               
-        }
     }
 }

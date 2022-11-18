@@ -21,7 +21,7 @@ namespace restaurantUtility.Models
         [Column("quantity", TypeName = "tinyint(4)")]
         public byte Quantity { get; set; }
         [Column("price", TypeName = "decimal(6,2)")]
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
         [Column("instruction")]
         [StringLength(100)]
         public string Instruction { get; set; }

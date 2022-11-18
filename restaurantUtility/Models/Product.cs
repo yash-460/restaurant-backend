@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 #nullable disable
@@ -35,8 +36,8 @@ namespace restaurantUtility.Models
         [Required]
         [Column("price", TypeName = "decimal(6,2)")]
         public decimal? Price { get; set; }
-        [Column("img_loc", TypeName = "blob")]
-        public byte[] ImgLoc { get; set; }
+        [Column("img_loc", TypeName = "mediumtext")]
+        public byte[]? ImgLoc { get; set; }
         [Column("rating", TypeName = "double(1,0)")]
         public double? Rating { get; set; }
         [Column("active")]
@@ -46,10 +47,13 @@ namespace restaurantUtility.Models
         [InverseProperty("Products")]
         public virtual Store Store { get; set; }
         [InverseProperty(nameof(Cart.Product))]
+        [JsonIgnore]
         public virtual ICollection<Cart> Carts { get; set; }
         [InverseProperty(nameof(Favourite.Product))]
+        [JsonIgnore]
         public virtual ICollection<Favourite> Favourites { get; set; }
         [InverseProperty(nameof(OrderDetail.Product))]
+        [JsonIgnore]
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
     }
 }

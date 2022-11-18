@@ -7,7 +7,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using AuthService.Models;
-using StoreManagementService.Models;
 using restaurantUtility.Models;
 
 namespace AuthService.Controllers

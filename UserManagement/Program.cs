@@ -14,6 +14,14 @@ namespace UserManagement
 
             // Add services to the container.
             builder.Services.AddDbContext<restaurantDBContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("restaurantDB")));
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: "cors",
+                                  policy =>
+                                  {
+                                      policy.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
+                                  });
+            });
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -46,6 +54,7 @@ namespace UserManagement
             }
 
             app.UseHttpsRedirection();
+            app.UseCors("cors");
             app.UseAuthentication();
             app.UseAuthorization();
 

@@ -5,10 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Utilities;
 using restaurantUtility.Data;
 using restaurantUtility.Models;
 using StoreManagementService.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace StoreManagementService.Controllers
 {
@@ -28,6 +32,12 @@ namespace StoreManagementService.Controllers
         public async Task<ActionResult<IEnumerable<Store>>> GetStores()
         {
             return await _context.Stores.Include(s => s.Products).ToListAsync();
+        }
+
+        [HttpGet("tax/{id}")]
+        public async Task<ActionResult<decimal>> GetStoreTax(short id)
+        {
+            return await _context.Stores.Where(s => s.StoreId == id).Select(store => store.TaxRate).FirstOrDefaultAsync();
         }
 
         // GET: api/Store/5
@@ -80,23 +90,23 @@ namespace StoreManagementService.Controllers
         public async Task<ActionResult<Store>> PostStore(StoreDTO storeDTO)
         {
             User user = await _context.Users.FindAsync(User.Identity.Name);
-            if(user == null)
-               return BadRequest("User not found");
+            if (user == null)
+                return BadRequest("User not found");
 
             Store store = new Store();
             DTOToStore(storeDTO, ref store);
-            
+
             _context.Stores.Add(store);
             await _context.SaveChangesAsync();
 
             user.StoreId = store.StoreId;
-            UserRole userRole = new UserRole{ 
+            UserRole userRole = new UserRole {
                 UserName = user.UserName,
                 Role = Constants.STORE_OWNER_ROLE
             };
             _context.UserRoles.Add(userRole);
             await _context.SaveChangesAsync();
-            
+
             return CreatedAtAction("GetStore", new { id = store.StoreId }, store);
         }
 
@@ -127,6 +137,59 @@ namespace StoreManagementService.Controllers
             store.TaxRate = storeDTO.TaxRate;
             store.ImgLoc = storeDTO.ImgLoc;
         }
+
+        [HttpGet("Report/")]
+        [Authorize(Roles ="owner")]
+        public async Task<ActionResult<List<Report>>> GetReport(short? storeId, DateTimeOffset? period)
+        {
+            if (storeId == null && period == null)
+                return BadRequest();
+            var query = "select od.product_id, SUM(od.quantity), SUM(od.quantity * od.price) ,SUM(o.tax * od.price * od.quantity) from Orders as o, order_details as od where od.order_id = o.order_id AND Year(o.ordered_time) = @Year and MONTH(o.ordered_time) = @Month and o.store_id = @StoreId Group By od.product_id";
+            List<Report> reports = new List<Report>();
+            MySqlConnection conn = null;
+            try
+            {
+                conn  = new MySqlConnection(_context.Database.GetConnectionString());
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Year", period.Value.Year);
+                    cmd.Parameters.AddWithValue("@Month", period.Value.Month);
+                    cmd.Parameters.AddWithValue("@StoreId", storeId);
+                    cmd.Prepare();
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            reports.Add(new Report
+                            {
+                                ProductId = reader.GetInt32(0),
+                                Quantity = reader.GetInt32(1),
+                                TotalAmount = reader.GetDecimal(2),
+                                TotalTax = reader.GetDecimal(3)
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally {
+                if(conn != null)
+                    conn.Close();
+            }
+
+            var products = await _context.Products.Where(p => p.StoreId == storeId).Select(p => new { productId = p.ProductId, productname = p.ProductName }).ToListAsync();
+
+            foreach (Report report in reports)
+                report.ProductName = products.Find(a => a.productId == report.ProductId).productname;
+
+            return reports;
+        }
+
+       
 
         private bool StoreExists(short id)
         {

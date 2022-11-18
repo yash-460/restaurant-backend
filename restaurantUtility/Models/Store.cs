@@ -46,7 +46,7 @@ namespace restaurantUtility.Models
         public string Zip { get; set; }
         [Column("rating", TypeName = "int(1)")]
         public int? Rating { get; set; }
-        [Column("img_loc", TypeName = "blob")]
+        [Column("img_loc", TypeName = "mediumtext")]
         public byte[] ImgLoc { get; set; }
 
         [InverseProperty(nameof(Order.Store))]
