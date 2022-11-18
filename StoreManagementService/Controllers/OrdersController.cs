@@ -23,7 +23,35 @@ namespace StoreManagementService.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
-            return await _context.Orders.Where(o => o.UserName == User.Identity.Name).Include(o => o.OrderDetails).Include(o => o.Store).ToListAsync();
+            var orders = await _context.Orders.Where(o => o.UserName == User.Identity.Name).Include(o => o.OrderDetails).OrderByDescending(o => o.OrderedTime).ToListAsync();
+
+            // populating with related entities without fetching all columns in them (Mainly Image)
+            HashSet<short> storeIds = new HashSet<short>();
+            orders.ForEach(o => storeIds.Add(o.StoreId));
+            var stores = await _context.Stores.Where(s => storeIds.Contains(s.StoreId)).Select(s => new { storeId = s.StoreId, name = s.Name}).ToListAsync();
+
+            HashSet<int> productIds = new HashSet<int>();
+            orders.ForEach(o => { 
+                o.OrderDetails.ToList().ForEach(od => productIds.Add(od.ProductId));
+            });
+            var products = await _context.Products.Where(p => productIds.Contains(p.ProductId)).Select(p => new {productIds = p.ProductId, productName = p.ProductName}).ToListAsync();
+
+            orders.ForEach(o => {
+                o.Store = new Store
+                {
+                    StoreId = o.StoreId,
+                    Name = stores.Find(s => s.storeId == o.StoreId).name
+                };
+                o.OrderDetails.ToList().ForEach(od => {
+                    od.Product = new Product
+                    {
+                        ProductId = od.ProductId,
+                        ProductName = products.Find(p => p.productIds == od.ProductId).productName
+                    };
+                });
+            });
+
+            return Ok(orders);
         }
 
         [HttpGet("Store/{id}")]
@@ -59,7 +87,7 @@ namespace StoreManagementService.Controllers
                 StoreId = items[0].Product.StoreId, // Get This
                 Status = Constants.ORDER_WAITING_APPROVAL,
                 Tax = storeTaxRate, // Get This
-                OrderedTime = DateTimeOffset.Now
+                OrderedTime = DateTime.Now
             };
             _context.Orders.Add(order);
             foreach(var item in items)

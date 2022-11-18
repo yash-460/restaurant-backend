@@ -140,21 +140,23 @@ namespace StoreManagementService.Controllers
 
         [HttpGet("Report/")]
         [Authorize(Roles ="owner")]
-        public async Task<ActionResult<List<Report>>> GetReport(short? storeId, DateTimeOffset? period)
+        public async Task<ActionResult<List<Report>>> GetReport(short? storeId, DateTime? startDate, DateTime? endDate)
         {
-            if (storeId == null && period == null)
+            if (storeId == null && startDate == null && endDate == null)
                 return BadRequest();
-            var query = "select od.product_id, SUM(od.quantity), SUM(od.quantity * od.price) ,SUM(o.tax * od.price * od.quantity) from Orders as o, order_details as od where od.order_id = o.order_id AND Year(o.ordered_time) = @Year and MONTH(o.ordered_time) = @Month and o.store_id = @StoreId Group By od.product_id";
+
+            var query = "select od.product_id, SUM(od.quantity), SUM(od.quantity * od.price) ,SUM((o.tax * od.price * od.quantity)/100) from Orders as o, order_details as od where od.order_id = o.order_id AND Date(o.ordered_time) >= @startDate and Date(o.ordered_time) <= @endDate and o.store_id = @StoreId Group By od.product_id";
             List<Report> reports = new List<Report>();
             MySqlConnection conn = null;
+
             try
             {
                 conn  = new MySqlConnection(_context.Database.GetConnectionString());
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@Year", period.Value.Year);
-                    cmd.Parameters.AddWithValue("@Month", period.Value.Month);
+                    cmd.Parameters.AddWithValue("@startDate", startDate);
+                    cmd.Parameters.AddWithValue("@endDate", endDate);
                     cmd.Parameters.AddWithValue("@StoreId", storeId);
                     cmd.Prepare();
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -165,8 +167,8 @@ namespace StoreManagementService.Controllers
                             {
                                 ProductId = reader.GetInt32(0),
                                 Quantity = reader.GetInt32(1),
-                                TotalAmount = reader.GetDecimal(2),
-                                TotalTax = reader.GetDecimal(3)
+                                TotalAmount = Math.Round(reader.GetDecimal(2),2),
+                                TotalTax = Math.Round(reader.GetDecimal(3),2)
                             });
                         }
                     }

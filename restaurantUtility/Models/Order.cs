@@ -35,7 +35,7 @@ namespace restaurantUtility.Models
         public decimal Tax { get; set; }
 
         [Column("ordered_time",TypeName = "timestamp")]
-        public DateTimeOffset OrderedTime { get; set; }
+        public DateTime OrderedTime { get; set; }
 
         [ForeignKey(nameof(StoreId))]
         [InverseProperty("Orders")]
