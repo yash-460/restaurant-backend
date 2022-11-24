@@ -34,8 +34,12 @@ namespace restaurantUtility.Models
         [Column("tax", TypeName = "decimal(4,2)")]
         public decimal Tax { get; set; }
 
-        [Column("ordered_time",TypeName = "timestamp")]
+        [Column("ordered_time", TypeName = "timestamp")]
         public DateTime OrderedTime { get; set; }
+
+        [Column("transaction_id")]
+        [StringLength(30)]
+        public string transactionId { get; set; }
 
         [ForeignKey(nameof(StoreId))]
         [InverseProperty("Orders")]

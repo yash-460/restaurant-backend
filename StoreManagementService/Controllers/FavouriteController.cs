@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using restaurantUtility.Data;
 using restaurantUtility.Models;
+using restaurantUtility.Util;
 
 namespace StoreManagementService.Controllers
 {
@@ -35,11 +36,11 @@ namespace StoreManagementService.Controllers
 
         [HttpGet("Product")]
         [Authorize]
-        public async Task<ActionResult<List<Favourite>>> GetFavouriteProduct()
+        public async Task<ActionResult<PaginatedList<Favourite>>> GetFavouriteProduct(int pageIndex = 1, int pageSize = 10)
         {
-            var favourites = await _context.Favourites.Include(fav => fav.Product).Where(fav => fav.UserName == User.Identity.Name).ToListAsync();
+            var favourites = _context.Favourites.Include(fav => fav.Product).Where(fav => fav.UserName == User.Identity.Name).AsNoTracking();
 
-            return favourites;
+            return await PaginatedList<Favourite>.CreateAsync(favourites,pageIndex,pageSize);
         }
 
 

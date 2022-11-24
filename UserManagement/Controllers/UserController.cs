@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
 using restaurantUtility.Data;
 using restaurantUtility.Models;
+using System.Security.Cryptography;
 using UserManagement.Models;
 
 namespace UserManagement.Controllers
@@ -73,6 +75,7 @@ namespace UserManagement.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
+            user.Password = HashPassword(user.Password);
             _context.Users.Add(user);
             try
             {
@@ -119,11 +122,19 @@ namespace UserManagement.Controllers
         public async Task<ActionResult<User>> ChangeUserPassword(Password password)
         {
             User user = await _context.Users.FindAsync(User.Identity.Name);
-            user.Password = password.password;
+            user.Password = HashPassword(password.password);
 
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetUser", new { id = user.UserName }, user);
+        }
+
+        private string HashPassword(string password)
+        {
+            SHA512Managed sha = new SHA512Managed();
+            byte[] input = Encoding.UTF8.GetBytes(password);
+            byte[] output = sha.ComputeHash(input);
+            return Convert.ToBase64String(output);
         }
 
         private UserDTO CreateDTO(User user)

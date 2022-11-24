@@ -65,6 +65,20 @@ namespace StoreManagementService.Controllers
             return NoContent();
         }
 
+        [HttpPut]
+        public async Task<IActionResult> PutCart(Cart cart)
+        {
+            var existingCart = await _context.Carts.FindAsync(User.Identity.Name,cart.ProductId);
+            if (existingCart == null)
+                return BadRequest();
+
+            existingCart.Instruction = cart.Instruction;
+            existingCart.Quantity = cart.Quantity;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCart(int id) {
             string userName = User.Identity.Name;

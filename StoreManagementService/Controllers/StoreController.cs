@@ -11,8 +11,8 @@ using MySql.Data.MySqlClient;
 using Org.BouncyCastle.Utilities;
 using restaurantUtility.Data;
 using restaurantUtility.Models;
+using restaurantUtility.Util;
 using StoreManagementService.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace StoreManagementService.Controllers
 {
@@ -29,9 +29,13 @@ namespace StoreManagementService.Controllers
 
         // GET: api/Store
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Store>>> GetStores()
+        public async Task<ActionResult<PaginatedList<Store>>> GetStores(string? search, int pageIndex = 1, int pageSize = 10)
         {
-            return await _context.Stores.Include(s => s.Products).ToListAsync();
+            IQueryable<Store> stores = _context.Stores.AsNoTracking();
+            if (search != null && search.Trim().Length != 0)
+                stores = stores.Where(s => s.Name.ToLower().Contains(search.ToLower())).AsNoTracking();
+
+            return await PaginatedList<Store>.CreateAsync(stores,pageIndex,pageSize);
         }
 
         [HttpGet("tax/{id}")]
@@ -42,9 +46,13 @@ namespace StoreManagementService.Controllers
 
         // GET: api/Store/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Store>> GetStore(short id)
+        public async Task<ActionResult<Store>> GetStore(short id, bool? active )
         {
-            var store = await _context.Stores.Include(s => s.Products).Where(s => s.StoreId == id).FirstAsync();
+            Store store = await _context.Stores.Include(s => s.Products).Where(s => s.StoreId == id).FirstAsync();
+            if (active == null || active.Value)
+            {
+                store.Products = store.Products.Where(p => p.Active).ToList();
+            }
 
             if (store == null)
             {
@@ -108,22 +116,6 @@ namespace StoreManagementService.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetStore", new { id = store.StoreId }, store);
-        }
-
-        // DELETE: api/Store/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStore(short id)
-        {
-            var store = await _context.Stores.FindAsync(id);
-            if (store == null)
-            {
-                return NotFound();
-            }
-
-            _context.Stores.Remove(store);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
         private void DTOToStore(StoreDTO storeDTO, ref Store store)

@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Text;
 using AuthService.Models;
 using restaurantUtility.Models;
+using System.Security.Cryptography;
 
 namespace AuthService.Controllers
 {
@@ -35,7 +36,7 @@ namespace AuthService.Controllers
         {
 
             var registerdUser = _dbContext.Users.Find(user.UserName);
-            if (registerdUser == null || !registerdUser.Password.Equals(user.Password))
+            if (registerdUser == null || !registerdUser.Password.Equals(HashPassword(user.Password)))
                 return Unauthorized();
 
             var token = await CreateToken(registerdUser);          
@@ -48,6 +49,14 @@ namespace AuthService.Controllers
             var registerdUser = _dbContext.Users.Find(User.Identity.Name);
             var token = await CreateToken(registerdUser);
             return Ok(new { token = token });
+        }
+
+        private string HashPassword(string password)
+        {
+            SHA512Managed sha = new SHA512Managed();
+            byte[] input = Encoding.UTF8.GetBytes(password);
+            byte[] output = sha.ComputeHash(input);
+            return Convert.ToBase64String(output);
         }
 
         private async Task<String> CreateToken(User user)
