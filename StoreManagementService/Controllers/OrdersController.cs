@@ -9,6 +9,11 @@ using restaurantUtility.Util;
 using StoreManagementService.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
+/**
+ * I Yash Chaudhary, 000820480 certify that this material is my original work.
+ * No other person's work has been used without due acknowledgement. 
+ * I have not made my work available to anyone else.
+ */
 namespace StoreManagementService.Controllers
 {
     [Route("api/[controller]")]
