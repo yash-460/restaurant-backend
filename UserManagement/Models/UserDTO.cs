@@ -15,7 +15,7 @@ namespace UserManagement.Models
         [StringLength(254)]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string? Email { get; set; }
-        public int? PhoneNumber { get; set; }
+        public long? PhoneNumber { get; set; }
         public int? StoreId { get; set; }
 
     }

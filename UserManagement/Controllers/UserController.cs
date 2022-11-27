@@ -11,7 +11,11 @@ using restaurantUtility.Data;
 using restaurantUtility.Models;
 using System.Security.Cryptography;
 using UserManagement.Models;
-
+/**
+ * I Yash Chaudhary, 000820480 certify that this material is my original work.
+ * No other person's work has been used without due acknowledgement. 
+ * I have not made my work available to anyone else.
+ */
 namespace UserManagement.Controllers
 {
     [Route("api/[controller]")]
@@ -76,6 +80,7 @@ namespace UserManagement.Controllers
         public async Task<ActionResult<User>> PostUser(User user)
         {
             user.Password = HashPassword(user.Password);
+            user.UserRoles = new UserRole[]{ new UserRole { Role = Constants.CUSTOMER_ROLE } };
             _context.Users.Add(user);
             try
             {

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using restaurantUtility.Data;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace UserManagement
 {
@@ -13,6 +14,8 @@ namespace UserManagement
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddControllers().AddJsonOptions(x =>
+   x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
             builder.Services.AddDbContext<restaurantDBContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("restaurantDB")));
             builder.Services.AddCors(options =>
             {

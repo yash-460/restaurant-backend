@@ -14,6 +14,11 @@ using restaurantUtility.Models;
 using restaurantUtility.Util;
 using StoreManagementService.Models;
 
+/**
+ * I Yash Chaudhary, 000820480 certify that this material is my original work.
+ * No other person's work has been used without due acknowledgement. 
+ * I have not made my work available to anyone else.
+ */
 namespace StoreManagementService.Controllers
 {
     [Route("api/[controller]")]
@@ -97,25 +102,29 @@ namespace StoreManagementService.Controllers
         [Authorize]
         public async Task<ActionResult<Store>> PostStore(StoreDTO storeDTO)
         {
-            User user = await _context.Users.FindAsync(User.Identity.Name);
-            if (user == null)
-                return BadRequest("User not found");
+            using (var dbContextTransaction = _context.Database.BeginTransaction())
+            {
+                User user = await _context.Users.FindAsync(User.Identity.Name);
+                if (user == null)
+                    return BadRequest("User not found");
 
-            Store store = new Store();
-            DTOToStore(storeDTO, ref store);
+                Store store = new Store();
+                DTOToStore(storeDTO, ref store);
 
-            _context.Stores.Add(store);
-            await _context.SaveChangesAsync();
+                _context.Stores.Add(store);
+                await _context.SaveChangesAsync();
 
-            user.StoreId = store.StoreId;
-            UserRole userRole = new UserRole {
-                UserName = user.UserName,
-                Role = Constants.STORE_OWNER_ROLE
-            };
-            _context.UserRoles.Add(userRole);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetStore", new { id = store.StoreId }, store);
+                user.StoreId = store.StoreId;
+                UserRole userRole = new UserRole
+                {
+                    UserName = user.UserName,
+                    Role = Constants.STORE_OWNER_ROLE
+                };
+                _context.UserRoles.Add(userRole);
+                await _context.SaveChangesAsync();
+                dbContextTransaction.Commit();
+                return CreatedAtAction("GetStore", new { id = store.StoreId }, store);
+            }
         }
 
         private void DTOToStore(StoreDTO storeDTO, ref Store store)

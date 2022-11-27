@@ -38,7 +38,7 @@ namespace restaurantUtility.Models
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string? Email { get; set; }
         [Column("phone_number", TypeName = "int(10)")]
-        public int? PhoneNumber { get; set; }
+        public long? PhoneNumber { get; set; }
         [Column("store_id", TypeName = "int(4)")]
         public int? StoreId { get; set; }
 
